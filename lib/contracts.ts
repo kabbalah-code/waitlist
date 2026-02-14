@@ -1,0 +1,21 @@
+
+// Auto-generated contract addresses for frontend
+export const CONTRACT_ADDRESSES = {
+  KCODE_TOKEN: "0xa5287dD17c8Dc19ed51C64F554Fd247126618a19",
+  KABBALAH_NFT: "0x2fff64eF12b114740885BAd263Ecdf6Fb142212B",
+  GAME_ECONOMICS: "0x6dD73C55c76ecA400303AC626421BEd0d60DC9a9",
+  TEAM_VESTING: "0x9D4557a118da1262192147B64659C0Ed62091435",
+  
+  // Reserve addresses
+  COMMUNITY_RESERVE: "0xd84Bad72007e13eFEd72e0180647Ee5feE87Dc33",
+  LIQUIDITY_RESERVE: "0x2753A0804f6b08B9c95D51E2e6440DF4870eb655",
+  TREASURY_RESERVE: "0x884c96F32ccaE6d6629D63a8468965e51e24A0B7",
+  TEAM_RESERVE: "0x9D4557a118da1262192147B64659C0Ed62091435",
+};
+
+export const NETWORK_CONFIG = {
+  chainId: 80002,
+  name: "polygon-amoy",
+  rpcUrl: "https://rpc-amoy.polygon.technology",
+  blockExplorer: "https://amoy.polygonscan.com",
+};

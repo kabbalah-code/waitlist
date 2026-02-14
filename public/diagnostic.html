@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabbalah Code - Authentication Diagnostic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #FF9500;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .section {
+            background: #111;
+            border: 1px solid #FF9500;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #FF9500;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #FF9500;
+            background: #0a0a0a;
+        }
+        .success { border-left-color: #00ff00; }
+        .error { border-left-color: #ff0000; }
+        .warning { border-left-color: #ffaa00; }
+        .code {
+            background: #0a0a0a;
+            padding: 10px;
+            border: 1px solid #333;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        button {
+            background: #FF9500;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+        }
+        button:hover {
+            background: #FFB340;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.ok { background: #00ff00; color: #000; }
+        .status.fail { background: #ff0000; color: #fff; }
+        .status.warn { background: #ffaa00; color: #000; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 KABBALAH CODE - AUTHENTICATION DIAGNOSTIC</h1>
+        
+        <div class="section">
+            <h2>📍 Current Status</h2>
+            <div id="status-output">Running diagnostic...</div>
+        </div>
+
+        <div class="section">
+            <h2>💾 localStorage Data</h2>
+            <div id="storage-output">Checking...</div>
+        </div>
+
+        <div class="section">
+            <h2>🦊 MetaMask Status</h2>
+            <div id="metamask-output">Checking...</div>
+        </div>
+
+        <div class="section">
+            <h2>🌐 API Test</h2>
+            <div id="api-output">Testing...</div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Actions</h2>
+            <button onclick="clearStorage()">Clear localStorage</button>
+            <button onclick="goToHome()">Go to Home Page</button>
+            <button onclick="goToDashboard()">Go to Dashboard</button>
+            <button onclick="runDiagnostic()">Re-run Diagnostic</button>
+        </div>
+
+        <div class="section">
+            <h2>📋 Instructions</h2>
+            <div id="instructions-output">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        async function runDiagnostic() {
+            console.log('🔍 Starting diagnostic...');
+            
+            // Check current URL
+            const currentUrl = window.location.href;
+            document.getElementById('status-output').innerHTML = `
+                <div class="result">
+                    <strong>Current URL:</strong> ${currentUrl}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleString()}
+                </div>
+            `;
+
+            // Check localStorage
+            const wallet = localStorage.getItem('kabbalah_wallet');
+            const userId = localStorage.getItem('kabbalah_user_id');
+            
+            let storageHtml = '';
+            let isAuthenticated = false;
+            
+            if (wallet) {
+                try {
+                    const parsed = JSON.parse(wallet);
+                    storageHtml += `
+                        <div class="result success">
+                            <strong>✅ Wallet Data Found</strong><br>
+                            Address: ${parsed.address}<br>
+                            Wallet Number: ${parsed.walletNumber}<br>
+                            Connected: ${new Date(parsed.connectedAt).toLocaleString()}
+                        </div>
+                    `;
+                    isAuthenticated = true;
+                } catch (e) {
+                    storageHtml += `
+                        <div class="result error">
+                            <strong>❌ Invalid Wallet Data</strong><br>
+                            ${wallet}
+                        </div>
+                    `;
+                }
+            } else {
+                storageHtml += `
+                    <div class="result error">
+                        <strong>❌ No Wallet Data</strong><br>
+                        You need to connect your wallet first!
+                    </div>
+                `;
+            }
+
+            if (userId) {
+                storageHtml += `
+                    <div class="result success">
+                        <strong>✅ User ID Found</strong><br>
+                        ${userId}
+                    </div>
+                `;
+            } else {
+                storageHtml += `
+                    <div class="result error">
+                        <strong>❌ No User ID</strong><br>
+                        Authentication incomplete
+                    </div>
+                `;
+                isAuthenticated = false;
+            }
+
+            document.getElementById('storage-output').innerHTML = storageHtml;
+
+            // Check MetaMask
+            let metamaskHtml = '';
+            if (window.ethereum) {
+                metamaskHtml += `
+                    <div class="result success">
+                        <strong>✅ MetaMask Detected</strong>
+                    </div>
+                `;
+                
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        metamaskHtml += `
+                            <div class="result success">
+                                <strong>✅ MetaMask Connected</strong><br>
+                                Account: ${accounts[0]}
+                            </div>
+                        `;
+                    } else {
+                        metamaskHtml += `
+                            <div class="result warning">
+                                <strong>⚠️ MetaMask Not Connected</strong><br>
+                                Click "Connect Wallet" to connect
+                            </div>
+                        `;
+                    }
+                } catch (err) {
+                    metamaskHtml += `
+                        <div class="result error">
+                            <strong>❌ MetaMask Error</strong><br>
+                            ${err.message}
+                        </div>
+                    `;
+                }
+            } else {
+                metamaskHtml += `
+                    <div class="result error">
+                        <strong>❌ MetaMask Not Detected</strong><br>
+                        Please install MetaMask extension
+                    </div>
+                `;
+            }
+
+            document.getElementById('metamask-output').innerHTML = metamaskHtml;
+
+            // Test API
+            let apiHtml = '';
+            if (wallet && userId) {
+                try {
+                    const parsed = JSON.parse(wallet);
+                    const response = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-wallet-address': parsed.address,
+                            'x-user-id-storage': userId
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ walletAddress: parsed.address })
+                    });
+
+                    if (response.status === 200) {
+                        const data = await response.json();
+                        apiHtml += `
+                            <div class="result success">
+                                <strong>✅ API Call Successful (200)</strong><br>
+                                Authentication is working!<br>
+                                <div class="code">${JSON.stringify(data, null, 2)}</div>
+                            </div>
+                        `;
+                    } else if (response.status === 401) {
+                        apiHtml += `
+                            <div class="result error">
+                                <strong>❌ Unauthorized (401)</strong><br>
+                                Authentication failed. You need to connect your wallet properly.
+                            </div>
+                        `;
+                    } else {
+                        const data = await response.json();
+                        apiHtml += `
+                            <div class="result error">
+                                <strong>❌ API Error (${response.status})</strong><br>
+                                <div class="code">${JSON.stringify(data, null, 2)}</div>
+                            </div>
+                        `;
+                    }
+                } catch (err) {
+                    apiHtml += `
+                        <div class="result error">
+                            <strong>❌ API Request Failed</strong><br>
+                            ${err.message}
+                        </div>
+                    `;
+                }
+            } else {
+                apiHtml += `
+                    <div class="result warning">
+                        <strong>⚠️ Cannot Test API</strong><br>
+                        No authentication data available
+                    </div>
+                `;
+            }
+
+            document.getElementById('api-output').innerHTML = apiHtml;
+
+            // Show instructions
+            let instructionsHtml = '';
+            if (isAuthenticated) {
+                instructionsHtml = `
+                    <div class="result success">
+                        <strong>✅ YOU ARE AUTHENTICATED!</strong><br><br>
+                        Your wallet is connected and authentication is working.<br>
+                        You can now access the dashboard and use all features.<br><br>
+                        <button onclick="goToDashboard()">Go to Dashboard</button>
+                    </div>
+                `;
+            } else {
+                instructionsHtml = `
+                    <div class="result error">
+                        <strong>❌ YOU ARE NOT AUTHENTICATED!</strong><br><br>
+                        <strong>Follow these steps:</strong><br>
+                        1. Click "Clear localStorage" button above<br>
+                        2. Click "Go to Home Page" button<br>
+                        3. Click "Connect Wallet" button on the home page<br>
+                        4. Approve MetaMask connection<br>
+                        5. Sign the authentication message in MetaMask<br>
+                        6. Wait for automatic redirect to dashboard<br><br>
+                        <button onclick="clearAndGoHome()">Clear & Go to Home</button>
+                    </div>
+                `;
+            }
+
+            document.getElementById('instructions-output').innerHTML = instructionsHtml;
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            alert('localStorage cleared! Now go to home page and connect your wallet.');
+            runDiagnostic();
+        }
+
+        function goToHome() {
+            window.location.href = '/';
+        }
+
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function clearAndGoHome() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+
+        // Run diagnostic on page load
+        window.addEventListener('load', runDiagnostic);
+    </script>
+</body>
+</html>
