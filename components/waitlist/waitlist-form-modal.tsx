@@ -1,9 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (element: string | HTMLElement, options: any) => string;
+      reset: (widgetId: string) => void;
+      remove: (widgetId: string) => void;
+    };
+  }
+}
 
 interface WaitlistFormModalProps {
   isOpen: boolean;
@@ -21,12 +31,50 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
   const [registered, setRegistered] = useState(false);
   const [userStats, setUserStats] = useState<any>(null);
   const [connectingWallet, setConnectingWallet] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (propReferralCode) {
       setReferralCode(propReferralCode);
     }
   }, [propReferralCode]);
+
+  // Load Turnstile script
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
+        widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
+          callback: (token: string) => {
+            setTurnstileToken(token);
+          },
+          'error-callback': () => {
+            showToast('Captcha verification failed. Please try again.', 'error');
+            setTurnstileToken(null);
+          },
+          theme: 'dark',
+        });
+      }
+    };
+
+    return () => {
+      if (window.turnstile && widgetIdRef.current) {
+        window.turnstile.remove(widgetIdRef.current);
+        widgetIdRef.current = null;
+      }
+      document.body.removeChild(script);
+    };
+  }, [isOpen, showToast]);
 
   const connectWallet = async () => {
     if (typeof window === 'undefined' || !window.ethereum) {
@@ -69,6 +117,11 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
       return;
     }
 
+    if (!turnstileToken) {
+      showToast('Please complete the captcha verification', 'error');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch('/api/waitlist/register', {
@@ -78,7 +131,8 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
           email,
           walletAddress: walletAddress,
           twitterHandle: twitterHandle.replace('@', ''),
-          referredBy: referralCode || null
+          referredBy: referralCode || null,
+          turnstileToken
         })
       });
 
@@ -271,9 +325,14 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
               </div>
             )}
 
+            {/* Cloudflare Turnstile Captcha */}
+            <div className="flex justify-center">
+              <div ref={turnstileRef} />
+            </div>
+
             <Button
               onClick={handleRegister}
-              disabled={loading || !email || !walletAddress}
+              disabled={loading || !email || !walletAddress || !turnstileToken}
               className="w-full bg-gradient-to-r from-[#FF9500] to-orange-500 hover:from-[#FF9500]/80 hover:to-orange-400 h-12 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (

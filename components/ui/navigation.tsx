@@ -52,16 +52,12 @@ export function Navigation({ walletAddress, onConnectClick, onDisconnect }: Navi
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
+          {/* Logo - Text Only */}
           <Link href="/" className="flex items-center">
-            <Image 
-              src="/logo.png" 
-              alt="Kabbalah Code" 
-              width={180} 
-              height={50}
-              className="h-8 md:h-10 w-auto"
-              priority
-            />
+            <span className="font-serif text-2xl md:text-3xl font-bold">
+              <span className="text-[#FF9500]">KABBALAH</span>
+              <span className="text-white ml-2">CODE</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

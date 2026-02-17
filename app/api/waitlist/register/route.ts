@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, walletAddress, twitterHandle, referredBy } = await request.json();
+    const { email, walletAddress, twitterHandle, referredBy, turnstileToken } = await request.json();
 
     if (!email) {
       return NextResponse.json(
@@ -17,6 +17,41 @@ export async function POST(request: NextRequest) {
         { error: 'Wallet address is required' },
         { status: 400 }
       );
+    }
+
+    if (!turnstileToken) {
+      return NextResponse.json(
+        { error: 'Captcha verification required' },
+        { status: 400 }
+      );
+    }
+
+    // Verify Turnstile token
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    if (turnstileSecret) {
+      const turnstileResponse = await fetch(
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            secret: turnstileSecret,
+            response: turnstileToken,
+          }),
+        }
+      );
+
+      const turnstileData = await turnstileResponse.json();
+
+      if (!turnstileData.success) {
+        console.error('Turnstile verification failed:', turnstileData);
+        return NextResponse.json(
+          { error: 'Captcha verification failed. Please try again.' },
+          { status: 400 }
+        );
+      }
     }
 
     const supabase = await createClient();

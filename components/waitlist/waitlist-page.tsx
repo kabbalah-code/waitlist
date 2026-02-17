@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { WalletConnect } from '@/components/WalletConnect';
+import { WalletConnectButton } from '@/components/web3/WalletConnectButton';
 
 export default function WaitlistPage() {
   const { address, isConnected } = useAccount();
@@ -268,7 +268,7 @@ export default function WaitlistPage() {
 
               {!isConnected && (
                 <div className="pt-2">
-                  <WalletConnect />
+                  <WalletConnectButton />
                   <p className="text-xs text-gray-400 mt-2">Optional: Connect wallet for extra benefits</p>
                 </div>
               )}

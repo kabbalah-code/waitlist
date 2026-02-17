@@ -11,13 +11,13 @@ interface CtaSectionProps {
 export function CtaSection({ onConnectClick }: CtaSectionProps) {
   return (
     <AnimatedSection className="py-24 md:py-32 px-4 bg-gradient-to-b from-gray-900/30 to-black">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-2 md:px-4">
         {/* Ornate CTA frame */}
-        <div className="relative px-6">
+        <div className="relative px-2 md:px-6">
           {/* Orange glow effect */}
           <div className="absolute -inset-4 bg-gradient-to-r from-[#FF9500]/20 via-orange-500/30 to-[#FF9500]/20 rounded-3xl blur-2xl" />
           
-          <div className="relative border-2 border-[#FF9500]/50 bg-gradient-to-br from-black/50 to-gray-900/50 backdrop-blur-sm p-8 md:p-16 text-center rounded-2xl overflow-hidden">
+          <div className="relative border-2 border-[#FF9500]/50 bg-gradient-to-br from-black/50 to-gray-900/50 backdrop-blur-sm p-6 md:p-16 text-center rounded-2xl overflow-hidden">
             {/* Decorative corners */}
             <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-[#FF9500]/70" />
             <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-[#FF9500]/70" />
@@ -52,20 +52,20 @@ export function CtaSection({ onConnectClick }: CtaSectionProps) {
                   <div className="absolute -inset-2 bg-gradient-to-r from-[#FF9500] via-orange-500 to-[#FF9500] rounded-xl opacity-75 blur-sm animate-pulse" />
                   <button
                     onClick={onConnectClick}
-                    className="relative px-10 py-5 bg-gradient-to-r from-[#FF9500] to-orange-500 hover:from-[#FF9500]/80 hover:to-orange-400 text-black font-bold text-lg uppercase tracking-wide transition-all duration-300 transform hover:scale-105 rounded-xl border border-[#FF9500]/50"
+                    className="relative px-6 sm:px-10 py-3 sm:py-5 bg-gradient-to-r from-[#FF9500] to-orange-500 hover:from-[#FF9500]/80 hover:to-orange-400 text-black font-bold text-base sm:text-lg uppercase tracking-wide transition-all duration-300 transform hover:scale-105 rounded-xl border border-[#FF9500]/50 whitespace-nowrap"
                   >
                     Enter the Temple
                   </button>
                 </div>
 
                 <a
-                  href="https://t.me/KabbalahCodeBot"
+                  href="https://twitter.com/KabbalahCode"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-10 py-5 border-2 border-[#FF9500] text-[#FF9500] font-bold text-lg uppercase tracking-wide hover:bg-[#FF9500]/10 transition-colors flex items-center justify-center gap-2 rounded-xl"
+                  className="px-6 sm:px-10 py-3 sm:py-5 border-2 border-[#FF9500] text-[#FF9500] font-bold text-base sm:text-lg uppercase tracking-wide hover:bg-[#FF9500]/10 transition-colors flex items-center justify-center gap-2 rounded-xl whitespace-nowrap"
                 >
-                  Telegram Bot
-                  <ExternalLink className="w-5 h-5" />
+                  Join Twitter
+                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
               </div>
             </div>

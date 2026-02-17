@@ -2,7 +2,6 @@
 
 import { ChevronDown, Users, Zap, Crown } from "lucide-react"
 import { TreeOfLife } from "@/components/ui/tree-of-life"
-import { useEffect, useState } from "react"
 
 interface HeroSectionProps {
   onConnectClick: () => void
@@ -71,12 +70,12 @@ export function HeroSection({ onConnectClick }: HeroSectionProps) {
           </div>
 
           <a
-            href="https://t.me/KabbalahCodeBot"
+            href="https://twitter.com/KabbalahCode"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-4 border-2 border-[#FF9500] text-[#FF9500] font-bold text-lg uppercase tracking-wide hover:bg-[#FF9500]/10 transition-colors rounded-xl"
           >
-            Open Telegram
+            Join Twitter
           </a>
         </div>
 
