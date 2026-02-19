@@ -5,9 +5,6 @@
   "installCommand": "npm install",
   "devCommand": "npm run dev",
   "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
-    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
     "NEXT_PUBLIC_KCODE_TOKEN_ADDRESS": "0x93180EAF5b2C88A2F671cC186c329BEBE619fFB2",
     "NEXT_PUBLIC_KABBALAH_NFT_ADDRESS": "0x6fd8c8Cf46f539Bb095a88a55c65bb87ebA0D8A4",
     "NEXT_PUBLIC_GAME_ECONOMICS_ADDRESS": "0xa5287dD17c8Dc19ed51C64F554Fd247126618a19",
