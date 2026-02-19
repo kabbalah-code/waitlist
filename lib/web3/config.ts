@@ -15,8 +15,8 @@ if (!projectId) {
 const metadata = {
   name: 'KABBALAH CODE',
   description: 'Daily mystical predictions powered by sacred Kabbalah numerology',
-  url: 'https://kabbalahcode.space',
-  icons: ['https://kabbalahcode.space/logo.png']
+  url: 'https://www.kabbalahcode.space',
+  icons: ['https://www.kabbalahcode.space/logo.png']
 }
 
 const chains = [polygonAmoy] as const

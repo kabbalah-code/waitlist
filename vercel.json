@@ -4,6 +4,19 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "devCommand": "npm run dev",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "kabbalahcode.space"
+        }
+      ],
+      "destination": "https://www.kabbalahcode.space/:path*",
+      "permanent": true
+    }
+  ],
   "env": {
     "NEXT_PUBLIC_KCODE_TOKEN_ADDRESS": "0x93180EAF5b2C88A2F671cC186c329BEBE619fFB2",
     "NEXT_PUBLIC_KABBALAH_NFT_ADDRESS": "0x6fd8c8Cf46f539Bb095a88a55c65bb87ebA0D8A4",
