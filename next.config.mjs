@@ -6,10 +6,37 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Empty turbopack config to silence webpack warning
-  turbopack: {},
-  // Exclude problematic packages from bundling (Next.js 16+)
+  // Turbopack configuration
+  turbopack: {
+    resolveAlias: {
+      // Ignore problematic test files
+      '**/thread-stream/test/**': false,
+    },
+  },
+  // Exclude problematic packages from bundling
   serverExternalPackages: ['pino', 'thread-stream', 'pino-pretty'],
+  // Webpack configuration for production builds
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    
+    // Ignore test files and non-JS files in node_modules
+    config.module.rules.push({
+      test: /\.(sh|md|zip)$/,
+      type: 'asset/resource',
+      generator: {
+        emit: false,
+      },
+    });
+    
+    return config;
+  },
   async headers() {
     return [
       {
