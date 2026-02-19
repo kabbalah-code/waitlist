@@ -45,6 +45,18 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
   useEffect(() => {
     if (!isOpen) return;
 
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    
+    // Don't load Turnstile if site key is not configured
+    if (!siteKey) {
+      console.warn('Turnstile site key not configured');
+      // Auto-set token to bypass captcha in development
+      if (process.env.NODE_ENV === 'development') {
+        setTurnstileToken('dev-bypass-token');
+      }
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
     script.async = true;
@@ -54,7 +66,7 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
     script.onload = () => {
       if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
         widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
+          sitekey: siteKey,
           callback: (token: string) => {
             setTurnstileToken(token);
           },
@@ -69,10 +81,16 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
 
     return () => {
       if (window.turnstile && widgetIdRef.current) {
-        window.turnstile.remove(widgetIdRef.current);
+        try {
+          window.turnstile.remove(widgetIdRef.current);
+        } catch (e) {
+          console.error('Error removing Turnstile widget:', e);
+        }
         widgetIdRef.current = null;
       }
-      document.body.removeChild(script);
+      if (script.parentNode) {
+        document.body.removeChild(script);
+      }
     };
   }, [isOpen, showToast]);
 
@@ -117,7 +135,8 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
       return;
     }
 
-    if (!turnstileToken) {
+    // Only require turnstile token if site key is configured
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken) {
       showToast('Please complete the captcha verification', 'error');
       return;
     }
@@ -326,13 +345,15 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
             )}
 
             {/* Cloudflare Turnstile Captcha */}
-            <div className="flex justify-center">
-              <div ref={turnstileRef} />
-            </div>
+            {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+              <div className="flex justify-center">
+                <div ref={turnstileRef} />
+              </div>
+            )}
 
             <Button
               onClick={handleRegister}
-              disabled={loading || !email || !walletAddress || !turnstileToken}
+              disabled={loading || !email || !walletAddress || (!turnstileToken && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)}
               className="w-full bg-gradient-to-r from-[#FF9500] to-orange-500 hover:from-[#FF9500]/80 hover:to-orange-400 h-12 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
