@@ -6,6 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Empty turbopack config to silence warning about webpack config
+  turbopack: {},
   // Exclude problematic packages from bundling
   serverExternalPackages: ['pino', 'thread-stream', 'pino-pretty'],
   // Webpack configuration for production builds
