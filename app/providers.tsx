@@ -3,13 +3,26 @@
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { config, projectId } from '@/lib/web3/config'
-import { useInitializeWeb3Modal } from '@/lib/web3/walletconnect'
+import { useEffect, useState } from 'react'
 
 const queryClient = new QueryClient()
 
 export function Web3Provider({ children }: { children: React.ReactNode }) {
-  // Initialize Web3Modal on client side
-  useInitializeWeb3Modal(config, projectId)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </WagmiProvider>
+    )
+  }
   
   return (
     <WagmiProvider config={config}>
