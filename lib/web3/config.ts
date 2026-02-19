@@ -31,8 +31,8 @@ export const config = defaultWagmiConfig({
     storage: cookieStorage
   }),
   enableWalletConnect: true,
-  enableInjected: false, // Отключаем автоматическое подключение injected кошельков
-  enableEIP6963: false,
+  enableInjected: true,
+  enableEIP6963: true,
   enableCoinbase: true,
 })
 
@@ -40,7 +40,7 @@ export const config = defaultWagmiConfig({
 createWeb3Modal({
   wagmiConfig: config,
   projectId,
-  enableAnalytics: true,
+  enableAnalytics: false, // Отключаем аналитику чтобы избежать ошибок
   themeMode: 'dark',
   themeVariables: {
     '--w3m-color-mix': '#000000',
@@ -52,14 +52,6 @@ createWeb3Modal({
     'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
     '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
     '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
-  ],
-  includeWalletIds: [
-    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
-    'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
-    '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
-    '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
-    '163d2cf19babf05eb8962e9748f9ebe613ed52ebf9c8107c9a0f104bfcf161b3', // Phantom
-    'c03dfee351b6fcc421b4494ea33b9d4b92a984f87aa76d1663bb28705e95034a', // Uniswap
   ],
   allWallets: 'SHOW',
   defaultChain: polygonAmoy
