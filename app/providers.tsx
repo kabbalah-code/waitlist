@@ -4,6 +4,7 @@ import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { config, projectId } from '@/lib/web3/config'
 import { useEffect, useState } from 'react'
+import '@/lib/web3/walletconnect'
 
 const queryClient = new QueryClient()
 
