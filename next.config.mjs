@@ -6,13 +6,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Turbopack configuration
-  turbopack: {
-    resolveAlias: {
-      // Ignore problematic test files
-      '**/thread-stream/test/**': false,
-    },
-  },
   // Exclude problematic packages from bundling
   serverExternalPackages: ['pino', 'thread-stream', 'pino-pretty'],
   // Webpack configuration for production builds
