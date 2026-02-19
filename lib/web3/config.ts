@@ -31,8 +31,8 @@ export const config = defaultWagmiConfig({
     storage: cookieStorage
   }),
   enableWalletConnect: true,
-  enableInjected: true,
-  enableEIP6963: true,
+  enableInjected: false, // Отключаем автоматическое подключение injected кошельков
+  enableEIP6963: false,
   enableCoinbase: true,
 })
 
@@ -61,5 +61,6 @@ createWeb3Modal({
     '163d2cf19babf05eb8962e9748f9ebe613ed52ebf9c8107c9a0f104bfcf161b3', // Phantom
     'c03dfee351b6fcc421b4494ea33b9d4b92a984f87aa76d1663bb28705e95034a', // Uniswap
   ],
-  allWallets: 'SHOW'
+  allWallets: 'SHOW',
+  defaultChain: polygonAmoy
 })
