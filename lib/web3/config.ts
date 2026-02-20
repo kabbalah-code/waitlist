@@ -50,5 +50,10 @@ createWeb3Modal({
     '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
   ],
   allWallets: 'SHOW',
-  defaultChain: polygonAmoy
+  defaultChain: polygonAmoy,
+  features: {
+    email: false,
+    socials: [],
+    emailShowWallets: false
+  }
 })
