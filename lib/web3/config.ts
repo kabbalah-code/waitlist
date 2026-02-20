@@ -30,6 +30,10 @@ export const config = defaultWagmiConfig({
   storage: createStorage({
     storage: cookieStorage
   }),
+  enableWalletConnect: true,
+  enableInjected: true,
+  enableEIP6963: true,
+  enableCoinbase: true,
 })
 
 // 3. Create modal with try-catch to handle initialization errors
@@ -61,7 +65,10 @@ if (typeof window !== 'undefined') {
         analytics: false,
         onramp: false,
         swaps: false
-      }
+      },
+      // Disable auto-connect to always show modal
+      includeWalletIds: undefined,
+      excludeWalletIds: undefined,
     })
   } catch (error) {
     console.warn('WalletConnect initialization warning:', error)
