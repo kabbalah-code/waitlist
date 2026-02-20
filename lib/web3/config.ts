@@ -16,8 +16,8 @@ if (!projectId) {
 const metadata = {
   name: 'KABBALAH CODE',
   description: 'Daily mystical predictions powered by sacred Kabbalah numerology',
-  url: 'https://www.kabbalahcode.space',
-  icons: ['https://www.kabbalahcode.space/logo.png']
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://www.kabbalahcode.space',
+  icons: [typeof window !== 'undefined' ? `${window.location.origin}/logo.png` : 'https://www.kabbalahcode.space/logo.png']
 }
 
 const chains = [polygonAmoy] as const
@@ -37,6 +37,7 @@ createWeb3Modal({
   wagmiConfig: config,
   projectId,
   enableAnalytics: false,
+  enableOnramp: false,
   themeMode: 'dark',
   themeVariables: {
     '--w3m-color-mix': '#000000',
@@ -54,6 +55,9 @@ createWeb3Modal({
   features: {
     email: false,
     socials: [],
-    emailShowWallets: false
+    emailShowWallets: false,
+    analytics: false,
+    onramp: false,
+    swaps: false
   }
 })
