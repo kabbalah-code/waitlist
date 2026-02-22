@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
     const referralCode = searchParams.get('referralCode');
+    const walletAddress = searchParams.get('walletAddress');
 
     const supabase = await createClient();
 
@@ -14,17 +15,19 @@ export async function GET(request: NextRequest) {
       .from('waitlist_registrations')
       .select('*', { count: 'exact', head: true });
 
-    // If email or referral code provided, get user stats
+    // If email, referral code, or wallet address provided, get user stats
     let userStats = null;
-    if (email || referralCode) {
+    if (email || referralCode || walletAddress) {
       const query = supabase
         .from('waitlist_registrations')
-        .select('position, referral_code, referral_count, bonus_kcode, created_at');
+        .select('id, email, wallet_address, "position", referral_code, referral_count, points, bonus_kcode, created_at');
 
       if (email) {
         query.eq('email', email);
       } else if (referralCode) {
         query.eq('referral_code', referralCode);
+      } else if (walletAddress) {
+        query.eq('wallet_address', walletAddress);
       }
 
       const { data } = await query.single();

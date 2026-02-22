@@ -279,3 +279,60 @@
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+/* Web3Modal Custom Styling */
+w3m-modal,
+wcm-modal,
+w3m-modal *,
+wcm-modal * {
+  --w3m-z-index: 9999 !important;
+}
+
+/* Override Web3Modal colors to match Kabbalah theme */
+w3m-modal,
+wcm-modal {
+  --w3m-color-mix: #000000 !important;
+  --w3m-color-mix-strength: 20 !important;
+  --w3m-accent: #FF9500 !important;
+  --w3m-border-radius-master: 12px !important;
+  --w3m-font-family: var(--font-inter), sans-serif !important;
+}
+
+/* Hide social login options - multiple selectors for compatibility */
+w3m-modal [data-testid="w3m-social-login"],
+w3m-modal [data-testid="w3m-email-login"],
+wcm-modal [data-testid="w3m-social-login"],
+wcm-modal [data-testid="w3m-email-login"],
+w3m-social-button,
+w3m-email-login-widget,
+w3m-email-login-list,
+w3m-social-login-list,
+[data-testid*="social"],
+[data-testid*="email"],
+button[data-testid*="social"],
+button[data-testid*="email"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Additional hiding for social providers */
+w3m-modal button[aria-label*="Google"],
+w3m-modal button[aria-label*="Facebook"],
+w3m-modal button[aria-label*="Twitter"],
+w3m-modal button[aria-label*="Discord"],
+w3m-modal button[aria-label*="Apple"],
+w3m-modal button[aria-label*="GitHub"],
+wcm-modal button[aria-label*="Google"],
+wcm-modal button[aria-label*="Facebook"],
+wcm-modal button[aria-label*="Twitter"],
+wcm-modal button[aria-label*="Discord"],
+wcm-modal button[aria-label*="Apple"],
+wcm-modal button[aria-label*="GitHub"] {
+  display: none !important;
+}
+

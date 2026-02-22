@@ -2,26 +2,98 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { isValidEvmAddress } from "@/lib/anti-abuse/validators"
 import { isAdmin } from "@/lib/admin/auth"
+import { checkAdminRateLimit } from "@/lib/security/admin-rate-limiter"
+import { logSecurityEvent } from "@/lib/security/logger"
 
 export async function GET(request: NextRequest) {
   try {
     const wallet = request.nextUrl.searchParams.get("wallet")
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+               request.headers.get('x-real-ip') || 
+               'unknown'
+    const userAgent = request.headers.get('user-agent') || 'unknown'
 
     console.log("[API] /api/admin/stats - wallet from query:", wallet)
 
+    // Rate limit check
+    const rateLimit = await checkAdminRateLimit(ip, '/api/admin/stats')
+    if (!rateLimit.allowed) {
+      await logSecurityEvent({
+        type: 'rate_limit_exceeded',
+        severity: 'medium',
+        ip,
+        userAgent,
+        wallet: wallet || undefined,
+        endpoint: '/api/admin/stats',
+        details: { reason: rateLimit.reason }
+      })
+      
+      return NextResponse.json({ 
+        success: false, 
+        error: rateLimit.reason 
+      }, { 
+        status: 429,
+        headers: {
+          'Retry-After': rateLimit.retryAfter?.toString() || '60'
+        }
+      })
+    }
+
     if (!wallet || !isValidEvmAddress(wallet)) {
       console.log("[API] /api/admin/stats - invalid wallet")
-      return NextResponse.json({ success: false, error: "Valid wallet address required" }, { status: 400 })
+      
+      await logSecurityEvent({
+        type: 'suspicious_activity',
+        severity: 'low',
+        ip,
+        userAgent,
+        wallet: wallet || undefined,
+        endpoint: '/api/admin/stats',
+        details: { reason: 'Invalid wallet address' }
+      })
+      
+      return NextResponse.json({ 
+        success: false, 
+        error: "Valid wallet address required" 
+      }, { status: 400 })
     }
 
     const adminCheck = isAdmin(wallet)
     console.log("[API] /api/admin/stats - isAdmin check:", adminCheck, "for wallet:", wallet)
-    console.log("[API] /api/admin/stats - ADMIN_WALLET_ADDRESSES env:", process.env.ADMIN_WALLET_ADDRESSES)
 
     if (!adminCheck) {
       console.log("[API] /api/admin/stats - unauthorized")
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 })
+      
+      // Log unauthorized admin access attempt
+      await logSecurityEvent({
+        type: 'unauthorized_admin_access',
+        severity: 'high',
+        ip,
+        userAgent,
+        wallet,
+        endpoint: '/api/admin/stats',
+        details: { 
+          attemptedWallet: wallet,
+          adminWallets: process.env.ADMIN_WALLET_ADDRESSES 
+        }
+      })
+      
+      return NextResponse.json({ 
+        success: false, 
+        error: "Unauthorized" 
+      }, { status: 403 })
     }
+
+    // Log successful admin access
+    await logSecurityEvent({
+      type: 'admin_access_attempt',
+      severity: 'low',
+      ip,
+      userAgent,
+      wallet,
+      endpoint: '/api/admin/stats',
+      details: { success: true }
+    })
 
     const supabase = await createClient()
 
@@ -67,7 +139,10 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error("[API] Error in GET /api/admin/stats:", error)
-    return NextResponse.json({ success: false, error: "Failed to fetch stats" }, { status: 500 })
+    return NextResponse.json({ 
+      success: false, 
+      error: "Failed to fetch stats" 
+    }, { status: 500 })
   }
 }
 

@@ -4,6 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
+import { useAppKit } from '@reown/appkit/react';
+import { useAccount, useDisconnect } from 'wagmi';
+import { getBrowserFingerprint, getDetailedFingerprint } from '@/lib/fingerprint';
+import { getDeviceInfo } from '@/lib/device-info';
 
 declare global {
   interface Window {
@@ -23,15 +27,19 @@ interface WaitlistFormModalProps {
 
 export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralCode }: WaitlistFormModalProps) {
   const { showToast } = useToast();
+  const { open } = useAppKit();
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  
   const [email, setEmail] = useState('');
   const [twitterHandle, setTwitterHandle] = useState('');
   const [referralCode, setReferralCode] = useState(propReferralCode || '');
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [userStats, setUserStats] = useState<any>(null);
-  const [connectingWallet, setConnectingWallet] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [fingerprint, setFingerprint] = useState<string>('');
+  const [fingerprintLoading, setFingerprintLoading] = useState(true);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
@@ -40,6 +48,58 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
       setReferralCode(propReferralCode);
     }
   }, [propReferralCode]);
+
+  // Get browser fingerprint on mount
+  useEffect(() => {
+    if (isOpen) {
+      setFingerprintLoading(true);
+      getBrowserFingerprint().then(fp => {
+        setFingerprint(fp);
+        console.log('Browser fingerprint loaded:', fp);
+      }).catch(err => {
+        console.error('Failed to get fingerprint:', err);
+        setFingerprint('unknown');
+      }).finally(() => {
+        setFingerprintLoading(false);
+      });
+    }
+  }, [isOpen]);
+
+  // Check if user is already registered
+  useEffect(() => {
+    if (!isOpen || !address) return;
+
+    const checkRegistration = async () => {
+      try {
+        // Check localStorage first
+        const savedRegistration = localStorage.getItem('waitlist_registration');
+        if (savedRegistration) {
+          const data = JSON.parse(savedRegistration);
+          if (data.wallet_address === address) {
+            setRegistered(true);
+            setUserStats(data);
+            return;
+          }
+        }
+
+        // Check with API
+        const res = await fetch(`/api/waitlist/stats?walletAddress=${address}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.userStats) {
+            setRegistered(true);
+            setUserStats(data.userStats);
+            // Save to localStorage
+            localStorage.setItem('waitlist_registration', JSON.stringify(data.userStats));
+          }
+        }
+      } catch (error) {
+        console.error('Error checking registration:', error);
+      }
+    };
+
+    checkRegistration();
+  }, [isOpen, address]);
 
   // Load Turnstile script
   useEffect(() => {
@@ -95,25 +155,11 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
   }, [isOpen, showToast]);
 
   const connectWallet = async () => {
-    if (typeof window === 'undefined' || !window.ethereum) {
-      showToast('Please install MetaMask or another Web3 wallet', 'error');
-      return;
-    }
-
-    setConnectingWallet(true);
     try {
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
-      }) as string[];
-      if (accounts && accounts.length > 0) {
-        setWalletAddress(accounts[0]);
-        showToast('Wallet connected successfully', 'success');
-      }
+      await open();
     } catch (error) {
       console.error('Wallet connection error:', error);
       showToast('Failed to connect wallet', 'error');
-    } finally {
-      setConnectingWallet(false);
     }
   };
 
@@ -130,7 +176,7 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
       return;
     }
 
-    if (!walletAddress) {
+    if (!address) {
       showToast('Please connect your wallet first', 'error');
       return;
     }
@@ -143,15 +189,22 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
 
     setLoading(true);
     try {
+      // Get device info and detailed fingerprint
+      const deviceInfo = getDeviceInfo();
+      const detailedFp = await getDetailedFingerprint();
+      
       const res = await fetch('/api/waitlist/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          walletAddress: walletAddress,
+          walletAddress: address,
           twitterHandle: twitterHandle.replace('@', ''),
           referredBy: referralCode || null,
-          turnstileToken
+          turnstileToken,
+          fingerprint,
+          deviceInfo,
+          detailedFingerprint: detailedFp
         })
       });
 
@@ -165,6 +218,8 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
       if (data.success) {
         setRegistered(true);
         setUserStats(data.data);
+        // Save to localStorage
+        localStorage.setItem('waitlist_registration', JSON.stringify(data.data));
         showToast('Successfully joined the waitlist!', 'success');
       } else {
         showToast(data.error || 'Registration failed', 'error');
@@ -313,6 +368,10 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
                 onChange={(e) => setTwitterHandle(e.target.value)}
                 className="bg-black/50 border-[#FF9500]/30 text-white placeholder:text-gray-500 h-12"
               />
+              <p className="text-xs text-white/50 mt-1 flex items-center gap-1">
+                <span>💡</span>
+                <span>Add Twitter to unlock Daily Ritual (1-3 $KCODE/day) after launch</span>
+              </p>
             </div>
 
             {referralCode && (
@@ -322,25 +381,33 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
               </div>
             )}
 
-            {!walletAddress ? (
+            {!isConnected ? (
               <div className="space-y-2">
                 <Button
                   onClick={connectWallet}
-                  disabled={connectingWallet}
                   className="w-full bg-gradient-to-r from-[#FF9500] to-orange-500 hover:from-[#FF9500]/80 hover:to-orange-400 h-12 text-black font-bold"
                 >
-                  {connectingWallet ? 'Connecting...' : 'Connect Wallet (Required)'}
+                  Connect Wallet (Required)
                 </Button>
                 <p className="text-xs text-white/50 text-center">
                   Wallet connection required to prevent spam
                 </p>
               </div>
             ) : (
-              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-sm">
-                <span className="text-white/70">Wallet:</span>{' '}
-                <span className="font-mono text-green-400">
-                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                </span>
+              <div className="space-y-2">
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-sm">
+                  <span className="text-white/70">Wallet:</span>{' '}
+                  <span className="font-mono text-green-400">
+                    {address?.slice(0, 6)}...{address?.slice(-4)}
+                  </span>
+                </div>
+                <Button
+                  onClick={() => disconnect()}
+                  variant="outline"
+                  className="w-full border-red-500/30 text-red-500 hover:bg-red-500/10"
+                >
+                  Disconnect
+                </Button>
               </div>
             )}
 
@@ -353,7 +420,7 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
 
             <Button
               onClick={handleRegister}
-              disabled={loading || !email || !walletAddress || (!turnstileToken && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)}
+              disabled={loading || fingerprintLoading || !email || !isConnected || (!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken)}
               className="w-full bg-gradient-to-r from-[#FF9500] to-orange-500 hover:from-[#FF9500]/80 hover:to-orange-400 h-12 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
@@ -363,6 +430,14 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   Joining...
+                </span>
+              ) : fingerprintLoading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Loading...
                 </span>
               ) : (
                 'Join Waitlist'

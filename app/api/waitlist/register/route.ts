@@ -1,9 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit, checkVelocity } from '@/lib/rate-limiter';
+import { getEmailAnalysis } from '@/lib/email-validator';
+import { getDeviceScore } from '@/lib/device-info';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, walletAddress, twitterHandle, referredBy, turnstileToken } = await request.json();
+    const {
+      email,
+      walletAddress,
+      twitterHandle,
+      referredBy,
+      turnstileToken,
+      fingerprint,
+      deviceInfo,
+      detailedFingerprint
+    } = await request.json();
+
+    // Get IP address and user agent for anti-sybil tracking
+    const ipAddress = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    // Log IP detection for debugging
+    if (ipAddress === 'unknown') {
+      console.warn('[WAITLIST] IP address is unknown. Check proxy headers configuration in production.');
+    }
 
     if (!email) {
       return NextResponse.json(
@@ -11,6 +34,53 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // 1. Email validation
+    const emailAnalysis = getEmailAnalysis(email);
+    if (!emailAnalysis.isValid) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+    
+    if (emailAnalysis.isDisposable) {
+      return NextResponse.json(
+        { error: 'Disposable email addresses are not allowed. Please use a permanent email.' },
+        { status: 400 }
+      );
+    }
+    
+    if (emailAnalysis.score < 40) {
+      return NextResponse.json(
+        { error: 'Email address appears suspicious. Please use a different email.' },
+        { status: 400 }
+      );
+    }
+
+    // 2. Rate limiting
+    const rateLimit = await checkRateLimit(ipAddress, fingerprint, email);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { 
+          error: rateLimit.reason,
+          retryAfter: rateLimit.retryAfter
+        },
+        { status: 429 }
+      );
+    }
+
+    // 3. Velocity check
+    const velocity = await checkVelocity(ipAddress);
+    if (velocity.isBot) {
+      return NextResponse.json(
+        { error: 'Suspicious activity detected. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // 4. Calculate device score
+    const deviceScore = getDeviceScore(deviceInfo);
 
     if (!walletAddress) {
       return NextResponse.json(
@@ -28,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     // Verify Turnstile token
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-    if (turnstileSecret) {
+    if (turnstileSecret && turnstileToken !== 'dev-bypass-token') {
       const turnstileResponse = await fetch(
         'https://challenges.cloudflare.com/turnstile/v0/siteverify',
         {
@@ -52,6 +122,8 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+    } else if (!turnstileSecret && turnstileToken === 'dev-bypass-token') {
+      console.log('Development mode: Bypassing Turnstile verification');
     }
 
     const supabase = await createClient();
@@ -114,16 +186,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Insert registration
+    // Insert registration with anti-sybil data
     const { data, error } = await supabase
       .from('waitlist_registrations')
       .insert({
         email,
-        wallet_address: walletAddress, // Now required
+        wallet_address: walletAddress,
         twitter_handle: twitterHandle || null,
-        referred_by: referredBy || null
+        referred_by: referredBy || null,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        browser_fingerprint: fingerprint || 'unknown',
+        device_info: deviceInfo,
+        detailed_fingerprint: detailedFingerprint,
+        email_score: emailAnalysis.score,
+        is_disposable_email: emailAnalysis.isDisposable,
+        device_score: deviceScore,
+        registration_source: 'web'
       })
-      .select('id, email, wallet_address, referral_code, position, created_at')
+      .select('id, email, wallet_address, referral_code, "position", created_at')
       .single();
 
     if (error) {
@@ -153,10 +234,10 @@ export async function POST(request: NextRequest) {
     // Update positions
     await supabase.rpc('update_waitlist_positions');
 
-    // Get updated data with position and referral_count
+    // Get updated data with position, referral_count, and points
     const { data: updated } = await supabase
       .from('waitlist_registrations')
-      .select('position, referral_count')
+      .select('"position", referral_count, points')
       .eq('id', data.id)
       .single();
 
@@ -165,7 +246,8 @@ export async function POST(request: NextRequest) {
       data: {
         ...data,
         position: updated?.position || data.position,
-        referral_count: updated?.referral_count || 0
+        referral_count: updated?.referral_count || 0,
+        points: updated?.points || 0
       }
     });
 

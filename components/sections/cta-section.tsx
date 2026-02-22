@@ -83,6 +83,34 @@ export function CtaSection({ onConnectClick }: CtaSectionProps) {
             />
           </div>
           
+          {/* Documentation Links */}
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
+            <a
+              href="/docs/whitepaper-en.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-[#FF9500]/10 border border-[#FF9500]/30 text-[#FF9500] hover:bg-[#FF9500]/20 transition-colors rounded-lg text-sm font-medium"
+            >
+              📄 Whitepaper
+            </a>
+            <a
+              href="/docs/presentation-guide.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-[#FF9500]/10 border border-[#FF9500]/30 text-[#FF9500] hover:bg-[#FF9500]/20 transition-colors rounded-lg text-sm font-medium"
+            >
+              🎨 Presentation
+            </a>
+            <a
+              href="/docs/onepager.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-[#FF9500]/10 border border-[#FF9500]/30 text-[#FF9500] hover:bg-[#FF9500]/20 transition-colors rounded-lg text-sm font-medium"
+            >
+              📋 OnePager
+            </a>
+          </div>
+          
           {/* Social Links */}
           <div className="flex justify-center gap-6 mb-6">
             <a

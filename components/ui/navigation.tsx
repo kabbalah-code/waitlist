@@ -31,6 +31,12 @@ export function Navigation({ walletAddress, onConnectClick, onDisconnect }: Navi
     { href: "#faq", label: "FAQ" },
   ]
   
+  const docsLinks = [
+    { href: "/docs/whitepaper-en.md", label: "Whitepaper" },
+    { href: "/docs/presentation-guide.md", label: "Presentation" },
+    { href: "/docs/onepager.md", label: "OnePager" },
+  ]
+  
   const socialLinks = [
     { href: "https://t.me/kabbalah_code", icon: Send, label: "Telegram" },
     { href: "https://x.com/KabbalahCode", icon: Twitter, label: "Twitter" },
@@ -52,12 +58,16 @@ export function Navigation({ walletAddress, onConnectClick, onDisconnect }: Navi
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo - Text Only */}
+          {/* Logo - Image */}
           <Link href="/" className="flex items-center">
-            <span className="font-serif text-2xl md:text-3xl font-bold">
-              <span className="text-[#FF9500]">KABBALAH</span>
-              <span className="text-white ml-2">CODE</span>
-            </span>
+            <Image 
+              src="/logo.png" 
+              alt="KABBALAH CODE" 
+              width={180}
+              height={50}
+              className="h-10 md:h-12 w-auto"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -71,6 +81,27 @@ export function Navigation({ walletAddress, onConnectClick, onDisconnect }: Navi
                 {link.label}
               </button>
             ))}
+            
+            {/* Docs Dropdown */}
+            <div className="relative group">
+              <button className="text-white/70 hover:text-[#FF9500] transition-colors text-sm font-medium uppercase tracking-wide">
+                Docs
+              </button>
+              <div className="absolute top-full left-0 mt-2 w-48 bg-black/95 border border-[#FF9500]/30 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                {docsLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-3 text-white/70 hover:text-[#FF9500] hover:bg-[#FF9500]/10 transition-colors text-sm"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+            
             {socialLinks.map((link) => (
               <a
                 key={link.href}
@@ -136,6 +167,23 @@ export function Navigation({ walletAddress, onConnectClick, onDisconnect }: Navi
                   {link.label}
                 </button>
               ))}
+              
+              {/* Docs Section */}
+              <div className="border-t border-[#FF9500]/20 pt-4 mt-2">
+                <div className="text-white/50 text-xs uppercase tracking-wide mb-2 px-2">Documentation</div>
+                {docsLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-white/70 hover:text-[#FF9500] transition-colors text-sm py-2"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+              
               <div className="flex gap-4 py-2">
                 {socialLinks.map((link) => (
                   <a

@@ -374,7 +374,7 @@ export function TasksSection({ walletAddress, twitterConnected, telegramConnecte
       {successMessage && (
         <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 text-green-400 text-sm flex items-center gap-2">
           <Check size={16} />
-          <span dangerouslySetInnerHTML={{ __html: successMessage }} />
+          <span>{successMessage}</span>
         </div>
       )}
 

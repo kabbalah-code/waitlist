@@ -160,13 +160,19 @@ export default function WaitlistPageV2() {
                   className="bg-black/50 border-purple-500/30 text-white placeholder:text-gray-500 h-12 md:h-14 text-base md:text-lg"
                 />
 
-                <Input
-                  type="text"
-                  placeholder="Twitter Handle (optional)"
-                  value={twitterHandle}
-                  onChange={(e) => setTwitterHandle(e.target.value)}
-                  className="bg-black/50 border-purple-500/30 text-white placeholder:text-gray-500 h-12 md:h-14 text-base md:text-lg"
-                />
+                <div>
+                  <Input
+                    type="text"
+                    placeholder="Twitter Handle (optional)"
+                    value={twitterHandle}
+                    onChange={(e) => setTwitterHandle(e.target.value)}
+                    className="bg-black/50 border-purple-500/30 text-white placeholder:text-gray-500 h-12 md:h-14 text-base md:text-lg"
+                  />
+                  <p className="text-xs text-white/50 mt-2 flex items-center gap-1">
+                    <span>💡</span>
+                    <span>Add Twitter to unlock Daily Ritual (1-3 $KCODE/day) after launch</span>
+                  </p>
+                </div>
 
                 {!isConnected ? (
                   <div className="space-y-3">

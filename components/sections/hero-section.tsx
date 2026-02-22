@@ -40,12 +40,21 @@ export function HeroSection({ onConnectClick }: HeroSectionProps) {
             <div className="absolute -bottom-4 -left-4 w-8 h-8 border-l-2 border-b-2 border-[#FF9500]/70" />
             <div className="absolute -bottom-4 -right-4 w-8 h-8 border-r-2 border-b-2 border-[#FF9500]/70" />
             
-            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight">
-              <span className="text-[#FF9500] drop-shadow-2xl block" style={{ textShadow: '0 0 30px rgba(255, 149, 0, 0.6)' }}>
-                KABBALAH
-              </span>
-              <span className="text-white block mt-2 drop-shadow-xl">CODE</span>
-            </h1>
+            {isWaitlistEnabled ? (
+              <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+                <span className="text-[#FF9500] drop-shadow-2xl block" style={{ textShadow: '0 0 30px rgba(255, 149, 0, 0.6)' }}>
+                  KABBALAH
+                </span>
+                <span className="text-white block mt-2 drop-shadow-xl">CODE</span>
+              </h1>
+            ) : (
+              <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+                <span className="text-[#FF9500] drop-shadow-2xl block" style={{ textShadow: '0 0 30px rgba(255, 149, 0, 0.6)' }}>
+                  KABBALAH
+                </span>
+                <span className="text-white block mt-2 drop-shadow-xl">CODE</span>
+              </h1>
+            )}
           </div>
         </div>
 

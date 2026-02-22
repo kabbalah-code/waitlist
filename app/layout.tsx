@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ToastProvider } from "@/components/ui/toast"
 import { Web3Provider } from "./providers"
 import "./globals.css"
+import "./reown-custom.css"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -164,12 +165,36 @@ export default function RootLayout({
     ],
   }
 
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Kabbalah Code',
+    url: 'https://kabbalahcode.space',
+    logo: 'https://kabbalahcode.space/logo.png',
+    description: 'Daily mystical predictions powered by sacred Kabbalah numerology. Earn $KCODE tokens and unlock sacred NFTs.',
+    foundingDate: '2024',
+    sameAs: [
+      'https://twitter.com/KabbalahCode',
+      'https://t.me/kabbalah_code'
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Support',
+      email: 'support@kabbalahcode.space',
+      availableLanguage: ['English', 'Russian']
+    }
+  }
+
   return (
     <html lang="en" className="dark">
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
       <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-black text-white`}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { X, Wallet, ExternalLink, Loader2, CheckCircle, AlertCircle, Smartphone } from "lucide-react"
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useAppKit } from '@reown/appkit/react'
 import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import { useRouter } from "next/navigation"
 
@@ -18,7 +18,7 @@ type ConnectionState = "idle" | "connecting" | "signing" | "creating" | "success
 export function WalletModal({ isOpen, onClose, onSuccess, referralCode }: WalletModalProps) {
   const [state, setState] = useState<ConnectionState>("idle")
   const [error, setError] = useState("")
-  const { open } = useWeb3Modal()
+  const { open } = useAppKit()
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
   const { signMessageAsync } = useSignMessage()
