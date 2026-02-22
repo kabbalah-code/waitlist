@@ -1,0 +1,28 @@
+# Test files
+**/test/**
+**/*.test.js
+**/*.test.ts
+**/*.test.tsx
+**/*.test.mjs
+**/*.spec.js
+**/*.spec.ts
+**/*.spec.tsx
+
+# Benchmark files
+**/bench.js
+**/benchmark/**
+
+# Development files
+**/.git
+**/.github
+**/node_modules/**/test
+**/node_modules/**/tests
+**/node_modules/**/*.test.*
+**/node_modules/**/bench.js
+
+# Documentation
+**/*.md
+!README.md
+
+# Backup files
+_github_ready_backup/

@@ -6,18 +6,47 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Turbopack config
-  turbopack: {},
-  // Exclude problematic packages from bundling
-  serverExternalPackages: ['pino', 'thread-stream', 'pino-pretty'],
+  // Turbopack configuration to exclude test files and problematic packages
+  turbopack: {
+    resolveAlias: {
+      // Exclude test files from WalletConnect packages
+      '@walletconnect/*/test': false,
+      '@walletconnect/*/bench.js': false,
+    },
+  },
+  // Exclude problematic packages from bundling (Next.js 16+)
+  serverExternalPackages: [
+    'pino', 
+    'thread-stream', 
+    'pino-pretty',
+    'desm',
+    'fastbench',
+    'tap',
+    'pino-elasticsearch',
+    'why-is-node-running'
+  ],
   // Webpack configuration for production builds
   webpack: (config, { isServer }) => {
+    // Exclude test files and dev dependencies
+    config.module = config.module || {};
+    config.module.rules = config.module.rules || [];
+    
+    config.module.rules.push({
+      test: /node_modules\/@walletconnect\/.*\/(test|bench\.js)/,
+      use: 'null-loader',
+    });
+
+    // Ignore specific problematic files
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
         net: false,
         tls: false,
+        crypto: false,
       };
     }
     
