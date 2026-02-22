@@ -1,1 +1,6 @@
-{}
+{
+  "buildCommand": "npm run build",
+  "env": {
+    "TURBOPACK": "0"
+  }
+}
