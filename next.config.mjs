@@ -6,7 +6,19 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  turbopack: {},
+  turbopack: {
+    rules: {
+      '*.test.{js,mjs,ts,tsx}': {
+        loaders: ['ignore-loader'],
+      },
+      '*/test/**': {
+        loaders: ['ignore-loader'],
+      },
+      '*/tests/**': {
+        loaders: ['ignore-loader'],
+      },
+    },
+  },
   serverExternalPackages: [
     'pino', 
     'thread-stream', 
