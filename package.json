@@ -70,8 +70,8 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
-    "@reown/appkit": "^1.8.18",
-    "@reown/appkit-adapter-wagmi": "^1.8.18",
+    "@reown/appkit": "^1.8.21",
+    "@reown/appkit-adapter-wagmi": "^1.8.21",
     "@sentry/nextjs": "^10.27.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
@@ -127,11 +127,8 @@
     "npm": ">=8.0.0"
   },
   "overrides": {
-    "@walletconnect/sign-client": "2.21.1",
-    "@walletconnect/universal-provider": "2.21.1",
     "inflight": "npm:@zkochan/inflight@^1.0.0",
     "rimraf": "^6.0.1",
-    "glob": "^11.0.0",
-    "valtio": "2.3.0"
+    "glob": "^11.0.0"
   }
 }
