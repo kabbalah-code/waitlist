@@ -6,19 +6,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  turbopack: {
-    resolveAlias: {
-      // Ignore test files in node_modules
-      '**/test/**': false,
-      '**/tests/**': false,
-      '**/*.test.js': false,
-      '**/*.test.mjs': false,
-      '**/*.test.ts': false,
-      '**/*.spec.js': false,
-      '**/*.spec.mjs': false,
-      '**/*.spec.ts': false,
-    },
-  },
   serverExternalPackages: [
     'pino', 
     'thread-stream', 
