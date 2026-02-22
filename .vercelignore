@@ -1,5 +1,7 @@
-# Test files
+# Test files - aggressive exclusion
 **/test/**
+**/tests/**
+**/__tests__/**
 **/*.test.js
 **/*.test.ts
 **/*.test.tsx
@@ -7,22 +9,37 @@
 **/*.spec.js
 **/*.spec.ts
 **/*.spec.tsx
+**/*.spec.mjs
 
 # Benchmark files
 **/bench.js
 **/benchmark/**
+**/*.bench.js
 
 # Development files
 **/.git
 **/.github
 **/node_modules/**/test
 **/node_modules/**/tests
+**/node_modules/**/__tests__
 **/node_modules/**/*.test.*
+**/node_modules/**/*.spec.*
 **/node_modules/**/bench.js
+**/node_modules/**/benchmark
 
-# Documentation
+# WalletConnect specific test files
+**/node_modules/@walletconnect/**/test/**
+**/node_modules/@walletconnect/**/tests/**
+**/node_modules/@walletconnect/**/*.test.*
+**/node_modules/@walletconnect/**/bench.js
+
+# Documentation and non-code files
 **/*.md
 !README.md
+**/*.sh
+**/*.zip
+**/LICENSE
+**/CHANGELOG.md
 
 # Backup files
 _github_ready_backup/

@@ -6,14 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Turbopack configuration to exclude test files and problematic packages
-  turbopack: {
-    resolveAlias: {
-      // Exclude test files from WalletConnect packages
-      '@walletconnect/*/test': false,
-      '@walletconnect/*/bench.js': false,
-    },
-  },
+  // Turbopack configuration - empty to use webpack config
+  turbopack: {},
   // Exclude problematic packages from bundling (Next.js 16+)
   serverExternalPackages: [
     'pino', 
@@ -31,12 +25,16 @@ const nextConfig = {
     config.module = config.module || {};
     config.module.rules = config.module.rules || [];
     
+    // Ignore problematic file types that cause build errors
     config.module.rules.push({
-      test: /node_modules\/@walletconnect\/.*\/(test|bench\.js)/,
-      use: 'null-loader',
+      test: /\.(sh|md|zip|LICENSE|test\.js|test\.ts|test\.mjs|spec\.js|spec\.ts|bench\.js)$/,
+      type: 'asset/resource',
+      generator: {
+        emit: false,
+      },
     });
 
-    // Ignore specific problematic files
+    // Configure resolve
     config.resolve = config.resolve || {};
     config.resolve.alias = config.resolve.alias || {};
     
@@ -49,15 +47,6 @@ const nextConfig = {
         crypto: false,
       };
     }
-    
-    // Ignore test files and non-JS files in node_modules
-    config.module.rules.push({
-      test: /\.(sh|md|zip)$/,
-      type: 'asset/resource',
-      generator: {
-        emit: false,
-      },
-    });
     
     return config;
   },
