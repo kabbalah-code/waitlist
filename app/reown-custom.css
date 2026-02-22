@@ -1,0 +1,72 @@
+/* Reown AppKit Custom Styles - Kabbalah Code Theme */
+
+/* Override modal styles */
+w3m-modal,
+wcm-modal,
+w3m-router {
+  --w3m-accent: #FF9500 !important;
+  --w3m-color-mix: #FF9500 !important;
+  --w3m-color-mix-strength: 10 !important;
+  --w3m-border-radius-master: 0px !important; /* Sharp corners */
+  --w3m-font-family: var(--font-inter), sans-serif !important;
+}
+
+/* Modal container - sharp corners and orange border */
+w3m-modal::part(container),
+wcm-modal::part(container) {
+  border-radius: 0 !important;
+  border: 2px solid #FF9500 !important;
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.3) !important;
+}
+
+/* Wallet buttons - sharp corners */
+w3m-modal wui-list-wallet,
+w3m-modal wui-card-select,
+w3m-modal wui-list-item,
+wcm-modal wui-list-wallet,
+wcm-modal wui-card-select,
+wcm-modal wui-list-item {
+  border-radius: 0 !important;
+  border: 1px solid rgba(255, 149, 0, 0.3) !important;
+}
+
+/* Wallet buttons hover */
+w3m-modal wui-list-wallet:hover,
+w3m-modal wui-card-select:hover,
+w3m-modal wui-list-item:hover {
+  border-color: #FF9500 !important;
+  background: rgba(255, 149, 0, 0.1) !important;
+}
+
+/* Connect button */
+w3m-modal wui-button,
+wcm-modal wui-button {
+  border-radius: 0 !important;
+  border: 1px solid #FF9500 !important;
+}
+
+/* QR code container */
+w3m-modal wui-qr-code,
+wcm-modal wui-qr-code {
+  border-radius: 0 !important;
+  border: 2px solid #FF9500 !important;
+}
+
+/* Input fields */
+w3m-modal input,
+wcm-modal input {
+  border-radius: 0 !important;
+  border: 1px solid rgba(255, 149, 0, 0.3) !important;
+}
+
+/* Tabs */
+w3m-modal wui-tabs,
+wcm-modal wui-tabs {
+  border-radius: 0 !important;
+}
+
+/* Close button */
+w3m-modal wui-icon-button,
+wcm-modal wui-icon-button {
+  border-radius: 0 !important;
+}
