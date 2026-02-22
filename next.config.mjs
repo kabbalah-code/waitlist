@@ -6,9 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Empty turbopack config signals we're using webpack intentionally
-  turbopack: {},
-  // Exclude problematic packages from bundling (Next.js 16+)
+  // Exclude problematic packages from bundling
   serverExternalPackages: [
     'pino', 
     'thread-stream', 
