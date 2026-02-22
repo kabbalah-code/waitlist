@@ -1,6 +1,1 @@
-{
-  "buildCommand": "next build --no-turbopack",
-  "env": {
-    "NEXT_PRIVATE_DISABLE_TURBOPACK": "1"
-  }
-}
+{}
