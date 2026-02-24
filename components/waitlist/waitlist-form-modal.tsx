@@ -447,20 +447,6 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
 
           {/* Benefits */}
           <div className="mt-8 pt-6 border-t border-[#FF9500]/20">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl mb-1">🔐</div>
-                <div className="text-xs text-white/70">Wallet Required</div>
-              </div>
-              <div>
-                <div className="text-2xl mb-1">💎</div>
-                <div className="text-xs text-white/70">Bonus $KCODE</div>
-              </div>
-              <div>
-                <div className="text-2xl mb-1">🌟</div>
-                <div className="text-xs text-white/70">Free NFT</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
