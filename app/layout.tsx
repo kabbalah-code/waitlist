@@ -1,11 +1,11 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Playfair_Display, Inter } from "next/font/google"
-import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ToastProvider } from "@/components/ui/toast"
 import { Web3Provider } from "./providers"
+import GoogleAnalytics from "./google-analytics"
 import "./globals.css"
 import "./reown-custom.css"
 
@@ -199,20 +199,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-black text-white`}>
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-GGX8M2NM82"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-GGX8M2NM82');
-          `}
-        </Script>
-        
+        <GoogleAnalytics />
         <Web3Provider>
           <ToastProvider>
             {children}
