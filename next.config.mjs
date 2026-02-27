@@ -56,11 +56,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://challenges.cloudflare.com https://va.vercel-scripts.com https://static.cloudflareinsights.com https://vercel.live",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://challenges.cloudflare.com https://va.vercel-scripts.com https://static.cloudflareinsights.com https://vercel.live https://www.googletagmanager.com https://www.google-analytics.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob: https://api.web3modal.org https://api.web3modal.com",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://*.supabase.co https://*.vercel-insights.com https://*.vercel-analytics.com wss://*.supabase.co https://challenges.cloudflare.com https://polygon-rpc.com https://rpc.ankr.com https://cloudflareinsights.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.com wss://*.walletconnect.org https://rpc.walletconnect.com https://rpc.walletconnect.org https://relay.walletconnect.com https://pulse.walletconnect.com https://pulse.walletconnect.org https://api.web3modal.com https://api.web3modal.org https://rpc-amoy.polygon.technology https://cca-lite.coinbase.com https://*.coinbase.com https://keys.coinbase.com https://vercel.live",
+              "connect-src 'self' https://*.supabase.co https://*.vercel-insights.com https://*.vercel-analytics.com wss://*.supabase.co https://challenges.cloudflare.com https://polygon-rpc.com https://rpc.ankr.com https://cloudflareinsights.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.com wss://*.walletconnect.org https://rpc.walletconnect.com https://rpc.walletconnect.org https://relay.walletconnect.com https://pulse.walletconnect.com https://pulse.walletconnect.org https://api.web3modal.com https://api.web3modal.org https://rpc-amoy.polygon.technology https://cca-lite.coinbase.com https://*.coinbase.com https://keys.coinbase.com https://vercel.live https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
               "frame-src 'self' https://challenges.cloudflare.com https://verify.walletconnect.com https://verify.walletconnect.org https://secure.walletconnect.com https://secure.walletconnect.org",
               "object-src 'none'",
               "base-uri 'self'",
