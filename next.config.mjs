@@ -57,6 +57,7 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://challenges.cloudflare.com https://va.vercel-scripts.com https://static.cloudflareinsights.com https://vercel.live https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com",
+              "script-src-elem 'self' 'unsafe-inline' https://challenges.cloudflare.com https://va.vercel-scripts.com https://static.cloudflareinsights.com https://vercel.live https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob: https://api.web3modal.org https://api.web3modal.com https://www.google-analytics.com https://ssl.google-analytics.com",
               "font-src 'self' data: https://fonts.gstatic.com",
