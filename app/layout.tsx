@@ -197,7 +197,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-        <!-- Google tag (gtag.js) -->
+       
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-GGX8M2NM82"></script>
         <script>
          window.dataLayer = window.dataLayer || [];
