@@ -199,13 +199,13 @@ export default function RootLayout({
         />
        
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-GGX8M2NM82"></script>
-        <script>
+        <script
          window.dataLayer = window.dataLayer || [];
          function gtag(){dataLayer.push(arguments);}
          gtag('js', new Date());
 
          gtag('config', 'G-GGX8M2NM82');
-        </script>
+        />
       </head>
       <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-black text-white`}>
        
