@@ -5,7 +5,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ToastProvider } from "@/components/ui/toast"
 import { Web3Provider } from "./providers"
-import Script from "next/script"
 import "./globals.css"
 import "./reown-custom.css"
 
@@ -190,6 +189,20 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <head>
         <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-GGX8M2NM82"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-GGX8M2NM82');
+            `,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
@@ -197,18 +210,8 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-       
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-GGX8M2NM82"></script>
-        <script
-         window.dataLayer = window.dataLayer || [];
-         function gtag(){dataLayer.push(arguments);}
-         gtag('js', new Date());
-
-         gtag('config', 'G-GGX8M2NM82');
-        />
       </head>
       <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-black text-white`}>
-       
         <Web3Provider>
           <ToastProvider>
             {children}
