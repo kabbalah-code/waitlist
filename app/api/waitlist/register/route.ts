@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate Turnstile token is present
     if (!turnstileToken) {
       return NextResponse.json(
         { error: 'Captcha verification required' },
@@ -96,34 +97,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify Turnstile token
+    // Verify Turnstile token with Cloudflare
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-    if (turnstileSecret && turnstileToken !== 'dev-bypass-token') {
-      const turnstileResponse = await fetch(
-        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            secret: turnstileSecret,
-            response: turnstileToken,
-          }),
-        }
+    
+    if (!turnstileSecret) {
+      console.error('TURNSTILE_SECRET_KEY is not configured');
+      return NextResponse.json(
+        { error: 'Server configuration error. Please contact support.' },
+        { status: 500 }
       );
+    }
 
-      const turnstileData = await turnstileResponse.json();
-
-      if (!turnstileData.success) {
-        console.error('Turnstile verification failed:', turnstileData);
-        return NextResponse.json(
-          { error: 'Captcha verification failed. Please try again.' },
-          { status: 400 }
-        );
+    const turnstileResponse = await fetch(
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          secret: turnstileSecret,
+          response: turnstileToken,
+        }),
       }
-    } else if (!turnstileSecret && turnstileToken === 'dev-bypass-token') {
-      console.log('Development mode: Bypassing Turnstile verification');
+    );
+
+    const turnstileData = await turnstileResponse.json();
+
+    if (!turnstileData.success) {
+      console.error('Turnstile verification failed:', {
+        success: turnstileData.success,
+        'error-codes': turnstileData['error-codes'],
+        hostname: turnstileData.hostname,
+        challenge_ts: turnstileData.challenge_ts,
+      });
+      
+      // Provide more specific error messages
+      const errorCodes = turnstileData['error-codes'] || [];
+      let errorMessage = 'Captcha verification failed. Please try again.';
+      
+      if (errorCodes.includes('timeout-or-duplicate')) {
+        errorMessage = 'Captcha expired or already used. Please refresh and try again.';
+      } else if (errorCodes.includes('invalid-input-response')) {
+        errorMessage = 'Invalid captcha response. Please refresh and try again.';
+      } else if (errorCodes.includes('bad-request')) {
+        errorMessage = 'Captcha verification error. Please contact support.';
+      }
+      
+      return NextResponse.json(
+        { 
+          error: errorMessage,
+          details: process.env.NODE_ENV === 'development' ? turnstileData : undefined
+        },
+        { status: 400 }
+      );
     }
 
     const supabase = await createClient();
