@@ -32,9 +32,8 @@ export function Navigation({ walletAddress, onConnectClick, onDisconnect }: Navi
   ]
   
   const docsLinks = [
-    { href: "/docs/whitepaper-en.md", label: "Whitepaper" },
-    { href: "/docs/presentation-guide.md", label: "Presentation" },
-    { href: "/docs/onepager.md", label: "OnePager" },
+    { href: "/docs/whitepaper.pdf", label: "Whitepaper" },
+    { href: "/docs/onepager.pdf", label: "OnePager" },
   ]
   
   const socialLinks = [
