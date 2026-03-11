@@ -158,9 +158,9 @@ export async function POST(request: NextRequest) {
     // Check if already registered (by wallet or email)
     const { data: existing, error: checkError } = await supabase
       .from('waitlist_registrations')
-      .select('id, referral_code, position, email, wallet_address')
+      .select('id, referral_code, position, email, wallet_address, referral_count, points')
       .or(`email.eq.${email},wallet_address.eq.${walletAddress}`)
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single to avoid error when no rows
 
     // If table doesn't exist, return helpful error
     if (checkError && checkError.code === '42P01') {
@@ -190,10 +190,15 @@ export async function POST(request: NextRequest) {
         }
       }
       
+      // Return existing registration data
       return NextResponse.json({
         success: true,
         alreadyRegistered: true,
-        data: existing
+        data: {
+          ...existing,
+          referral_count: existing.referral_count || 0,
+          points: existing.points || 0
+        }
       });
     }
 
@@ -258,13 +263,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update positions
-    await supabase.rpc('update_waitlist_positions');
+    // Positions are now calculated automatically by triggers
+    // But we can manually trigger recalculation if needed
+    try {
+      await supabase.rpc('recalculate_waitlist_positions');
+    } catch (rpcError) {
+      // Ignore RPC errors - positions will be calculated by triggers
+      console.log('RPC recalculate_waitlist_positions not available, using triggers');
+    }
 
     // Get updated data with position, referral_count, and points
     const { data: updated } = await supabase
       .from('waitlist_registrations')
-      .select('"position", referral_count, points')
+      .select('"position", referral_count, points, bonus_kcode')
       .eq('id', data.id)
       .single();
 
@@ -274,7 +285,8 @@ export async function POST(request: NextRequest) {
         ...data,
         position: updated?.position || data.position,
         referral_count: updated?.referral_count || 0,
-        points: updated?.points || 0
+        points: updated?.points || 0,
+        bonus_kcode: updated?.bonus_kcode || 1
       }
     });
 
