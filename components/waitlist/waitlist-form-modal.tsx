@@ -71,30 +71,29 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
 
     const checkRegistration = async () => {
       try {
-        // Check localStorage first
-        const savedRegistration = localStorage.getItem('waitlist_registration');
-        if (savedRegistration) {
-          const data = JSON.parse(savedRegistration);
-          if (data.wallet_address === address) {
-            setRegistered(true);
-            setUserStats(data);
-            return;
-          }
-        }
-
-        // Check with API
+        // Check with API first (source of truth)
         const res = await fetch(`/api/waitlist/stats?walletAddress=${address}`);
         if (res.ok) {
           const data = await res.json();
           if (data.userStats) {
             setRegistered(true);
             setUserStats(data.userStats);
-            // Save to localStorage
+            // Update localStorage with fresh data
             localStorage.setItem('waitlist_registration', JSON.stringify(data.userStats));
+            return;
           }
         }
+        
+        // If not found in API, clear localStorage (table might have been cleared)
+        localStorage.removeItem('waitlist_registration');
+        setRegistered(false);
+        setUserStats(null);
       } catch (error) {
         console.error('Error checking registration:', error);
+        // On error, clear localStorage to allow re-registration
+        localStorage.removeItem('waitlist_registration');
+        setRegistered(false);
+        setUserStats(null);
       }
     };
 
@@ -107,13 +106,9 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
 
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     
-    // Don't load Turnstile if site key is not configured
     if (!siteKey) {
-      console.warn('Turnstile site key not configured');
-      // Auto-set token to bypass captcha in development
-      if (process.env.NODE_ENV === 'development') {
-        setTurnstileToken('dev-bypass-token');
-      }
+      console.error('NEXT_PUBLIC_TURNSTILE_SITE_KEY is not configured');
+      showToast('Captcha configuration error. Please contact support.', 'error');
       return;
     }
 
@@ -181,8 +176,8 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
       return;
     }
 
-    // Only require turnstile token if site key is configured
-    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken) {
+    // Require Turnstile token in production
+    if (!turnstileToken) {
       showToast('Please complete the captcha verification', 'error');
       return;
     }
@@ -278,10 +273,14 @@ export function WaitlistFormModal({ isOpen, onClose, referralCode: propReferralC
             </div>
 
             {/* Stats */}
-            <div className="mb-8">
+            <div className="mb-8 grid grid-cols-2 gap-4">
               <div className="bg-black/30 border-2 border-[#FF9500]/30 rounded-xl p-6 text-center">
-                <div className="text-5xl font-bold text-[#FF9500] mb-2">{userStats.referral_count || 0}</div>
-                <div className="text-lg text-white/70">Referrals</div>
+                <div className="text-4xl font-bold text-[#FF9500] mb-2">{userStats.referral_count || 0}</div>
+                <div className="text-sm text-white/70">Referrals</div>
+              </div>
+              <div className="bg-black/30 border-2 border-[#FF9500]/30 rounded-xl p-6 text-center">
+                <div className="text-4xl font-bold text-[#FF9500] mb-2">{userStats.bonus_kcode || 1}</div>
+                <div className="text-sm text-white/70">Bonus $KCODE</div>
               </div>
             </div>
 
